@@ -21,8 +21,5 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
 
-    - name: Dar permissão de execução para o Maven Wrapper
-      run: chmod +x mvnw
-
     - name: Executar os Testes com o Robô
-      run: ./mvnw clean test
+      run: mvn clean test
