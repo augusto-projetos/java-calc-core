@@ -10,7 +10,7 @@ O objetivo deste projeto é desacoplar do desenvolvimento web/banco de dados par
 
 O projeto será construído em etapas incrementais, evoluindo a complexidade algorítmica a cada fase:
 
-- [ ] **Fase 1: Motor Básico (Console)**
+- [ X ] **Fase 1: Motor Básico (Console)**
   - Operações aritméticas elementares (`+`, `-`, `*`, `/`).
   - Interface via CLI (Linha de Comando).
   - Validações básicas (Prevenção de divisão por zero, entradas inválidas).
