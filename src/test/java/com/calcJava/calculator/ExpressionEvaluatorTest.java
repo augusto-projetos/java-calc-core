@@ -1,0 +1,47 @@
+package com.calcJava.calculator;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class ExpressionEvaluatorTest {
+
+    // Classe cérebro da Fase 2
+    private ExpressionEvaluator evaluator;
+
+    // Limpeza para cada teste que for fazer
+    @BeforeEach
+    public void setUp() {
+        this.evaluator = new ExpressionEvaluator();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "'2 + 3', 5.0",
+        "'10 - 4 - 2', 4.0",
+        "'2 + 3 * 4', 14.0",
+        "'(2 + 3) * 4', 20.0",
+        "'10 / (2 + 3)', 2.0",
+        "'2.5 * 2 + 4 / 2', 7.0"
+    })
+    public void deveAvaliarExpressõesMatemáticasComplexas(String expressao, double resultadoEsperado) {
+        double resultadoObtido = evaluator.avaliar(expressao);
+
+        assertEquals(resultadoEsperado, resultadoObtido, 0.0001,
+                                                        /*
+                                                         Esse terceiro parâmetro é o delta (a tolerância de erro). Estamos dizendo: "Se a resposta do Java chegar incrivelmente perto do esperado, com uma diferença menor que 0.0001, considere correto".
+                                                        */
+            () -> String.format("Falha ao avaliar a expressão: %s", expressao));
+    }
+
+    @Test
+    public void deveLancaráExcecaoParaExpressaoMalFormatada() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            evaluator.avaliar("2 + * 3");
+        }, "Uma expressão com operadores consecutivos inválidos deve lançar exceção.");
+    }
+}
