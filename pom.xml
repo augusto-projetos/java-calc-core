@@ -23,7 +23,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- Necessária para os testes parametrizados (@ParameterizedTest) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

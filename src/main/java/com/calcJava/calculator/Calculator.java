@@ -1,7 +1,7 @@
 package com.calcJava.calculator;
 
 public class Calculator {
-    
+
     public double calcular(double num1, double num2, String operacao) {
 
         switch (operacao) {
