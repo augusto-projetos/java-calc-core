@@ -1,0 +1,177 @@
+package com.calcJava.calculator;
+
+import java.util.Stack;
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.List;
+
+public class ExpressionEvaluator {
+
+    /*
+     * Método principal que recebe a string da expressão (ex: "2 + 3 * 4")
+     * e retorna o resultado numérico final avaliado.
+     */
+    public double avaliar(String expressao) {
+        if (expressao == null || expressao.trim().isEmpty()) {
+            throw new IllegalArgumentException("A expressão não pode ser vazia.");
+        }
+
+        try {
+            List<String> tokensValidos = tokenizar(expressao);
+            List<String> ordemPosFixa = shuntingYard(tokensValidos);
+            return calcularPosFixa(ordemPosFixa);
+
+        } catch (EmptyStackException e) {
+            throw new IllegalArgumentException("Expressão mal formatada: parênteses ou operadores inválidos.");
+        }
+    }
+
+    // Ler a string caractere por caractere e agrupá-los em unidades com significado lógico
+    private List<String> tokenizar(String expressao) {
+        List<String> tokens = new ArrayList<>();
+        int i = 0;
+
+        while (i < expressao.length()) {
+            char c = expressao.charAt(i);
+
+            // 1. Ignorar espaços em branco
+            if (Character.isWhitespace(c)) {
+                i++;
+                continue;
+            }
+
+            // 2. Se for um operador ou parênteses, adiciona direto
+            if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')') {
+                tokens.add(String.valueOf(c));
+                i++;
+            }
+
+            // 3. Se for um dígito ou ponto decimal, vai "acumular" o número completo
+            else if (Character.isDigit(c) || c == '.') {
+                StringBuilder numero = new StringBuilder();
+
+                // Continua lendo enquanto for dígito ou ponto
+                while (i < expressao.length() && (Character.isDigit(expressao.charAt(i)) || expressao.charAt(i) == '.')) {
+                    numero.append(expressao.charAt(i));
+                    i++;
+                }
+
+                tokens.add(numero.toString());
+            }
+
+            // 4. Se encontrar algo que não faz sentido (como uma letra ou caractere especial inválido)
+            else {
+                throw new IllegalArgumentException("Caractere inválido na expressão: " + c);
+            }
+        }
+
+        return tokens;
+    }
+
+    // Auxiliar para dizermos quais são as ordens dos operadores
+    private int obterPrecedencia(String operador) {
+        switch (operador) {
+            case "+":
+            case "-":
+                return 1; // Mais fracos
+            case "*":
+            case "/":
+                return 2; // Mais fortes
+            default:
+                return -1; // Para parênteses ou tokens inválidos
+        }
+    }
+
+    // Aplicação da tecnica Shunting-yard
+    private List<String> shuntingYard(List<String> tokens) {
+        List<String> saida = new ArrayList<>();
+        Stack<String> pilhaOperadores = new Stack<>();
+
+        for (String token : tokens) {
+
+            // Se for número (o primeiro caractere é dígito)
+            if (Character.isDigit(token.charAt(0)) || (token.length() > 1 && token.charAt(1) == '.')) {
+                saida.add(token);
+            }
+
+            // Se for parênteses aberto
+            else if (token.equals("(")) {
+                pilhaOperadores.push(token);
+            }
+
+            // Se for parênteses fechado
+            else if (token.equals(")")) {
+
+                while (!pilhaOperadores.isEmpty() && !pilhaOperadores.peek().equals("(")) {
+                    saida.add(pilhaOperadores.pop());
+                }
+
+                if (pilhaOperadores.isEmpty()) {
+                    throw new IllegalArgumentException("Expressão mal formatada: parênteses desalinhados.");
+                }
+
+                pilhaOperadores.pop(); // Remove o "(" da pilha
+            }
+
+            // Se for um operador (+, -, *, /)
+            else {
+
+                while (!pilhaOperadores.isEmpty() &&
+                    obterPrecedencia(pilhaOperadores.peek()) >= obterPrecedencia(token)) {
+                    saida.add(pilhaOperadores.pop());
+                }
+
+                pilhaOperadores.push(token);
+            }
+        }
+
+        // Esvazia os operadores restantes da pilha para a saída
+        while (!pilhaOperadores.isEmpty()) {
+
+            String topo = pilhaOperadores.pop();
+
+            if (topo.equals("(") || topo.equals(")")) {
+                throw new IllegalArgumentException("Expressão mal formatada: parênteses desalinhados.");
+            }
+
+            saida.add(topo);
+        }
+
+        return saida;
+    }
+
+    // Calcula a expressão e vai redefinindo as ordens
+    private double calcularPosFixa(List<String> tokensPosFixos) {
+        Stack<Double> pilhaNumeros = new Stack<>();
+        Calculator calculadoraBasica = new Calculator();
+
+        for (String token : tokensPosFixos) {
+
+            // Se for número, empilha
+            if (Character.isDigit(token.charAt(0)) || (token.length() > 1 && token.charAt(1) == '.')) {
+                pilhaNumeros.push(Double.parseDouble(token));
+            }
+
+            // Se for operador, desempilha dois, calcula e empilha o resultado
+            else {
+
+                if (pilhaNumeros.size() < 2) {
+                    throw new IllegalArgumentException("Expressão mal formatada: operadores em excesso.");
+                }
+
+                double num2 = pilhaNumeros.pop(); // O topo da pilha é o segundo operando
+                double num1 = pilhaNumeros.pop(); // O de baixo é o primeiro operando
+
+                double resultado = calculadoraBasica.calcular(num1, num2, token);
+                pilhaNumeros.push(resultado);
+            }
+        }
+
+        if (pilhaNumeros.size() != 1) {
+            throw new IllegalArgumentException("Expressão mal formatada: números em excesso.");
+        }
+
+        return pilhaNumeros.pop();
+    }
+
+}
