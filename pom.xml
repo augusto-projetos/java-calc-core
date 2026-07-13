@@ -24,6 +24,14 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- Necessária para os testes parametrizados (@ParameterizedTest) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Engine do JUnit para rodar os testes -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
