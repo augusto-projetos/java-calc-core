@@ -26,7 +26,15 @@ public class ExpressionEvaluatorTest {
         "'2 + 3 * 4', 14.0",
         "'(2 + 3) * 4', 20.0",
         "'10 / (2 + 3)', 2.0",
-        "'2.5 * 2 + 4 / 2', 7.0"
+        "'2.5 * 2 + 4 / 2', 7.0",
+        "'2 ^ 3', 8.0",                // 2 ao cubo = 8
+        "'2 * pi', 6.283185307179586", // 2 * 3.1415...
+        "'e ^ 1', 2.718281828459045",  // Constante e elevada a 1
+        "'sin(0)', 0.0",
+        "'cos(0)', 1.0",
+        "'sqrt(9)', 3.0",
+        "'sin(pi / 2)', 1.0", // Seno de 90 graus em radiano
+        "'3 * sqrt(4) + 1', 7.0"
     })
     public void deveAvaliarExpressõesMatemáticasComplexas(String expressao, double resultadoEsperado) {
         double resultadoObtido = evaluator.avaliar(expressao);

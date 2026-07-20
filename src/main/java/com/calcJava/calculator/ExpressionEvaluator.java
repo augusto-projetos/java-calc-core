@@ -41,7 +41,7 @@ public class ExpressionEvaluator {
             }
 
             // 2. Se for um operador ou parênteses, adiciona direto
-            if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')') {
+            if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '(' || c == ')') {
                 tokens.add(String.valueOf(c));
                 i++;
             }
@@ -59,7 +59,20 @@ public class ExpressionEvaluator {
                 tokens.add(numero.toString());
             }
 
-            // 4. Se encontrar algo que não faz sentido (como uma letra ou caractere especial inválido)
+            // 4. Se for uma letra, acumula a palavra
+            else if (Character.isLetter(c)) {
+                StringBuilder palavra = new StringBuilder();
+
+                while (i < expressao.length() && Character.isLetter(expressao.charAt(i))) {
+                    palavra.append(expressao.charAt(i));
+                    i++;
+                }
+
+                // Adiciona a palavra em letras minúsculas para padronizar
+                tokens.add(palavra.toString().toLowerCase());
+            }
+
+            // 5. Se encontrar algo que não faz sentido (como uma letra ou caractere especial inválido)
             else {
                 throw new IllegalArgumentException("Caractere inválido na expressão: " + c);
             }
@@ -76,7 +89,15 @@ public class ExpressionEvaluator {
                 return 1; // Mais fracos
             case "*":
             case "/":
-                return 2; // Mais fortes
+                return 2;
+            case "^":
+                return 3;
+            case "sin":
+            case "cos":
+            case "tan":
+            case "sqrt":
+            case "log":
+                return 4; // Mais precedência
             default:
                 return -1; // Para parênteses ou tokens inválidos
         }
@@ -89,8 +110,8 @@ public class ExpressionEvaluator {
 
         for (String token : tokens) {
 
-            // Se for número (o primeiro caractere é dígito)
-            if (Character.isDigit(token.charAt(0)) || (token.length() > 1 && token.charAt(1) == '.')) {
+            // Se for número ou uma constante conhecida
+            if (Character.isDigit(token.charAt(0)) || token.equals("pi") || token.equals("e")) {
                 saida.add(token);
             }
 
@@ -147,9 +168,60 @@ public class ExpressionEvaluator {
 
         for (String token : tokensPosFixos) {
 
+            // Se for a constante PI
+            if (token.equals("pi")) {
+                pilhaNumeros.push(Math.PI);
+            }
+
+            // Se for a constante E
+            else if (token.equals("e")) {
+                pilhaNumeros.push(Math.E);
+            }
+
             // Se for número, empilha
-            if (Character.isDigit(token.charAt(0)) || (token.length() > 1 && token.charAt(1) == '.')) {
+            else if (Character.isDigit(token.charAt(0)) || (token.length() > 1 && token.charAt(1) == '.')) {
                 pilhaNumeros.push(Double.parseDouble(token));
+            }
+
+            // Se for o operador de potência
+            else if (token.equals("^")) {
+
+                if (pilhaNumeros.size() < 2) {
+                    throw new IllegalArgumentException("Expressão mal formatada: operadores em excesso.");
+                }
+
+                double expoente = pilhaNumeros.pop();
+                double base = pilhaNumeros.pop();
+                pilhaNumeros.push(Math.pow(base, expoente));
+            }
+
+            // Se for função científica
+            else if (token.equals("sin") || token.equals("cos") || token.equals("tan") || token.equals("sqrt") || token.equals("log")) {
+
+                if (pilhaNumeros.isEmpty()) throw new IllegalArgumentException("Expressão mal formatada: falta argumento para a função " + token);
+
+                double valor = pilhaNumeros.pop(); // Desempilha apenas um número
+                double resultado = 0;
+
+                switch (token) {
+                    case "sin":
+                        resultado = Math.sin(valor); break;
+
+                    case "cos":
+                        resultado = Math.cos(valor); break;
+
+                    case "tan":
+                        resultado = Math.tan(valor); break;
+
+                    case "sqrt":
+                        if (valor < 0) throw new ArithmeticException("Raiz quadrada de número negativo não permitida.");
+                        resultado = Math.sqrt(valor); break;
+
+                    case "log":
+                        if (valor <= 0) throw new ArithmeticException("Logaritmo de número menor ou igual a zero não permitido.");
+                        resultado = Math.log(valor); break;
+                }
+                pilhaNumeros.push(resultado); // Devolve o resultado científico
             }
 
             // Se for operador, desempilha dois, calcula e empilha o resultado
