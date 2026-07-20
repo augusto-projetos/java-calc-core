@@ -109,6 +109,20 @@ public class CalculatorGUI extends JFrame implements ActionListener {
         }
 
         add(painelBotoes, BorderLayout.CENTER);
+
+        // Carrega a imagem e define como ícone da janela
+        try {
+            java.net.URL url = getClass().getResource("/ico/calculator.png");
+            if (url != null) {
+                // Lê o PNG e converte em objeto de imagem nativo do Java
+                java.awt.Image icone = javax.imageio.ImageIO.read(url);
+                this.setIconImage(icone);
+            } else {
+                System.out.println("Erro: O arquivo /ico/calculator.png não foi encontrado na pasta resources.");
+            }
+        } catch (Exception ex) {
+            System.out.println("Não foi possível carregar o ícone da janela: " + ex.getMessage());
+        }
     }
 
     @Override
