@@ -34,7 +34,9 @@ public class ExpressionEvaluatorTest {
         "'cos(0)', 1.0",
         "'sqrt(9)', 3.0",
         "'sin(pi / 2)', 1.0", // Seno de 90 graus em radiano
-        "'3 * sqrt(4) + 1', 7.0"
+        "'3 * sqrt(4) + 1', 7.0",
+        "'cbrt(27)', 3.0",
+        "'cbrt(-8)', -2.0"
     })
     public void deveAvaliarExpressõesMatemáticasComplexas(String expressao, double resultadoEsperado) {
         double resultadoObtido = evaluator.avaliar(expressao);
