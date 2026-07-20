@@ -18,7 +18,7 @@ O projeto será construído em etapas incrementais, evoluindo a complexidade alg
   - Suporte a expressões completas com parênteses (ex: `(2 + 3) * 5`).
   - Implementação do algoritmo **Shunting-yard** de Edsger Dijkstra.
   - Uso de **Pilhas (Stacks)** para Notação Polonesa Inversa (RPN).
-- [ ] **Fase 3: Expansão Científica**
+- [ X ] **Fase 3: Expansão Científica**
   - Funções trigonométricas (`sin`, `cos`, `tan`).
   - Logaritmos, potenciação e radiciação.
   - Suporte a constantes matemáticas ($\pi$ e $e$).
