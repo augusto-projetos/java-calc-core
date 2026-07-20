@@ -22,7 +22,7 @@ O projeto será construído em etapas incrementais, evoluindo a complexidade alg
   - Funções trigonométricas (`sin`, `cos`, `tan`).
   - Logaritmos, potenciação e radiciação.
   - Suporte a constantes matemáticas ($\pi$ e $e$).
-- [ ] **Fase 4: Interface Gráfica (GUI) & Funções Especiais**
+- [ X ] **Fase 4: Interface Gráfica (GUI) & Funções Especiais**
   - Suporte a raiz cúbica (`cbrt`) e raízes genéticas.
   - Construção da interface visual estilo Windows Calculator utilizando Java Swing.
 
