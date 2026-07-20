@@ -40,13 +40,33 @@ public class ExpressionEvaluator {
                 continue;
             }
 
-            // 2. Se for um operador ou parênteses, adiciona direto
+            // 2. Tratar sinal unário de negativo
+            if (c == '-' && (tokens.isEmpty() || tokens.get(tokens.size() - 1).equals("(") ||
+                "+-*/^".contains(tokens.get(tokens.size() - 1)))) {
+
+                // Se o caractere seguinte for um dígito ou ponto, grudamos o '-' no número
+                if (i + 1 < expressao.length() && (Character.isDigit(expressao.charAt(i + 1)) || expressao.charAt(i + 1) == '.')) {
+
+                    StringBuilder numeroNegativo = new StringBuilder();
+                    numeroNegativo.append('-');
+                    i++; // Pula o '-'
+
+                    while (i < expressao.length() && (Character.isDigit(expressao.charAt(i)) || expressao.charAt(i) == '.')) {
+                        numeroNegativo.append(expressao.charAt(i));
+                        i++;
+                    }
+                    tokens.add(numeroNegativo.toString());
+                    continue;
+                }
+            }
+
+            // 3. Operadores normais e Parênteses
             if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '(' || c == ')') {
                 tokens.add(String.valueOf(c));
                 i++;
             }
 
-            // 3. Se for um dígito ou ponto decimal, vai "acumular" o número completo
+            // 4. Números Positivos
             else if (Character.isDigit(c) || c == '.') {
                 StringBuilder numero = new StringBuilder();
 
@@ -59,7 +79,7 @@ public class ExpressionEvaluator {
                 tokens.add(numero.toString());
             }
 
-            // 4. Se for uma letra, acumula a palavra
+            // 5. Palavras (funções e constantes)
             else if (Character.isLetter(c)) {
                 StringBuilder palavra = new StringBuilder();
 
@@ -72,7 +92,7 @@ public class ExpressionEvaluator {
                 tokens.add(palavra.toString().toLowerCase());
             }
 
-            // 5. Se encontrar algo que não faz sentido (como uma letra ou caractere especial inválido)
+            // 6. Se encontrar algo que não faz sentido (como uma letra ou caractere especial inválido)
             else {
                 throw new IllegalArgumentException("Caractere inválido na expressão: " + c);
             }
@@ -96,6 +116,7 @@ public class ExpressionEvaluator {
             case "cos":
             case "tan":
             case "sqrt":
+            case "cbrt":
             case "log":
                 return 4; // Mais precedência
             default:
@@ -111,7 +132,11 @@ public class ExpressionEvaluator {
         for (String token : tokens) {
 
             // Se for número ou uma constante conhecida
-            if (Character.isDigit(token.charAt(0)) || token.equals("pi") || token.equals("e")) {
+            if (Character.isDigit(token.charAt(0)) ||
+                (token.length() > 1 && token.charAt(0) == '-') ||
+                token.equals("pi") ||
+                token.equals("e")) {
+
                 saida.add(token);
             }
 
@@ -179,7 +204,10 @@ public class ExpressionEvaluator {
             }
 
             // Se for número, empilha
-            else if (Character.isDigit(token.charAt(0)) || (token.length() > 1 && token.charAt(1) == '.')) {
+            else if (Character.isDigit(token.charAt(0)) ||
+                    (token.length() > 1 && token.charAt(0) == '-') ||
+                    (token.length() > 1 && token.charAt(1) == '.')) {
+
                 pilhaNumeros.push(Double.parseDouble(token));
             }
 
@@ -196,7 +224,7 @@ public class ExpressionEvaluator {
             }
 
             // Se for função científica
-            else if (token.equals("sin") || token.equals("cos") || token.equals("tan") || token.equals("sqrt") || token.equals("log")) {
+            else if (token.equals("sin") || token.equals("cos") || token.equals("tan") || token.equals("sqrt") || token.equals("cbrt") || token.equals("log")) {
 
                 if (pilhaNumeros.isEmpty()) throw new IllegalArgumentException("Expressão mal formatada: falta argumento para a função " + token);
 
@@ -216,6 +244,9 @@ public class ExpressionEvaluator {
                     case "sqrt":
                         if (valor < 0) throw new ArithmeticException("Raiz quadrada de número negativo não permitida.");
                         resultado = Math.sqrt(valor); break;
+
+                    case "cbrt":
+                        resultado = Math.cbrt(valor); break;
 
                     case "log":
                         if (valor <= 0) throw new ArithmeticException("Logaritmo de número menor ou igual a zero não permitido.");
